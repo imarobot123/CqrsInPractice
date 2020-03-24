@@ -7,6 +7,7 @@ using FluentNHibernate.Conventions.Helpers;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
 using NHibernate;
+using NHibernate.Event;
 
 namespace Logic.Utils
 {
@@ -36,7 +37,18 @@ namespace Logic.Utils
                     .Conventions.Add<OtherConventions>()
                     .Conventions.Add<TableNameConvention>()
                     .Conventions.Add<HiLoConvention>()
-                );
+                )
+                .ExposeConfiguration(x =>
+                {
+                    x.EventListeners.PostCommitUpdateEventListeners =
+                        new IPostUpdateEventListener[] { new EventListener() };
+                    x.EventListeners.PostCommitInsertEventListeners =
+                        new IPostInsertEventListener[] { new EventListener() };
+                    x.EventListeners.PostCommitDeleteEventListeners =
+                        new IPostDeleteEventListener[] { new EventListener() };
+                    x.EventListeners.PostCollectionUpdateEventListeners =
+                        new IPostCollectionUpdateEventListener[] { new EventListener() };
+                });
 
             return configuration.BuildSessionFactory();
         }
